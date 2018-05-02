@@ -4,7 +4,7 @@ This project identifies vehicles and drivable road in dashcam images for the
 Lyft Perception Challenge.
 Dashcam images are extracted from the [CARLA simulator](http://carla.org/).
 
-![dashcam picture](https://raw.githubusercontent.com/ericlavigne/Lyft-Perception-Challenge/master/images/923.png)
+![dashcam picture](https://github.com/ericlavigne/Lyft-Perception-Challenge/raw/master/images/923.png)
 
 Installation
 ---
