@@ -35,6 +35,17 @@ grader 'python submit.py'
 submit
 ```
 
+Testing
+---
+
+For manual unit testing, the test.py script creates visual examples of each step
+in the /tmp/output directory. The test.py script assumes that training data can
+be found in /tmp/Train.
+
+```sh
+python test.py
+```
+
 Running the project
 ---
 
