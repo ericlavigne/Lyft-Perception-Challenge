@@ -25,6 +25,16 @@ pip install -r requirements.txt
 deactivate
 ```
 
+Official submission process
+---
+
+```sh
+./preinstall_script.sh
+cd Lyft-Perception-Challenge
+grader 'python submit.py'
+submit
+```
+
 Running the project
 ---
 
