@@ -1,4 +1,5 @@
 import numpy as np
+import os.path
 import random
 import util
 
@@ -26,7 +27,10 @@ class sample_generator(object):
 
 model = util.create_model()
 util.compile_model(model)
+if os.path.exists("road.h5"):
+  print("Loading existing model from road.h5")
+  model.load_weights("road.h5")
 model.fit_generator(sample_generator(batch_size=10),
                     steps_per_epoch=20,
-                    epochs=5)
+                    epochs=20)
 model.save_weights("road.h5")
