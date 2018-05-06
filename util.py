@@ -23,6 +23,16 @@ def write_mask(path,mask):
   img[mask > 0] = 254
   write_image(path,img)
 
+def write_probability(path,probability):
+  img = np.zeros_like(probability).astype(np.uint8)
+  img = np.stack((img,)*3, -1)
+  img[probability > 0.2] = [135,60,0] # brown
+  img[probability > 0.4] = [254,0,0] # red
+  img[probability > 0.5] = [254,135,0] # orange
+  img[probability > 0.6] = [254,254,0] # yellow
+  img[probability > 0.8] = [254,254,254] # white
+  write_image(path,img)
+
 def convert_image_to_road_mask(img):
   """Convert image from Lyft's semantic segmentation format to road mask.
      Lyft's format has category in red channel and 0 in other channels.

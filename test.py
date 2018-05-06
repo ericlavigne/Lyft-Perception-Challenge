@@ -17,4 +17,4 @@ for ex in examples:
   road_mask, car_mask = util.read_masks(ex)
   util.write_mask(base_out + "_truth.png",road_mask)
   road_infer = model.predict(np.array([util.preprocess_input_image(img)]), batch_size=1)[0]
-  util.write_image(base_out + "_infer.png", util.white_balance(road_infer))
+  util.write_probability(base_out + "_infer.png", road_infer)
