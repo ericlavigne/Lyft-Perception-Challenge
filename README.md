@@ -35,6 +35,16 @@ grader 'python submit.py'
 submit
 ```
 
+Training
+---
+
+The neural network training process assumes that training data can be found
+in /tmp/Train.
+
+```sh
+python train.py
+```
+
 Testing
 ---
 
@@ -44,24 +54,4 @@ be found in /tmp/Train.
 
 ```sh
 python test.py
-```
-
-Running the project
----
-
-```sh
-cd Lyft-Perception-Challenge
-source env/bin/activate
-python main.py
-deactivate
-```
-
-Installing new library
----
-
-```sh
-cd Lyft-Perception-Challenge
-source env/bin/activate
-pip freeze > requirements.txt
-deactivate
 ```
