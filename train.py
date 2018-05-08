@@ -20,9 +20,9 @@ class sample_generator(object):
     images = []
     masks = []
     for i in selected:
-      images.append(util.preprocess_input_image(util.read_train_image(i)))
+      images.append(util.preprocess_input_image(util.read_train_image(i),util.preprocess_opts))
       road_mask, car_mask = util.read_masks(i)
-      masks.append(road_mask)
+      masks.append(util.preprocess_mask(road_mask,util.preprocess_opts))
     return (np.array(images), np.array(masks))
 
 model = util.create_model()
