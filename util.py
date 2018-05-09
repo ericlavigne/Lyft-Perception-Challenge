@@ -117,7 +117,7 @@ def compile_model(model):
   """Would be part of create_model, except that same settings
      also need to be applied when loading model from file."""
   model.compile(optimizer='adam',
-                loss='mean_absolute_error',
+                loss='mean_squared_error',
                 metrics=['binary_accuracy', 'binary_crossentropy'])
 
 def create_model():
