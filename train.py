@@ -32,5 +32,5 @@ if os.path.exists("road.h5"):
   model.load_weights("road.h5")
 model.fit_generator(sample_generator(batch_size=10),
                     steps_per_epoch=20,
-                    epochs=20)
+                    epochs=50)
 model.save_weights("road.h5")
