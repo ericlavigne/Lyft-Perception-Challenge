@@ -25,7 +25,7 @@ class sample_generator(object):
       masks.append(util.preprocess_mask(road_mask,util.preprocess_opts))
     return (np.array(images), np.array(masks))
 
-model = util.create_model()
+model = util.create_model(util.preprocess_opts)
 util.compile_model(model)
 if os.path.exists("road.h5"):
   print("Loading existing model from road.h5")

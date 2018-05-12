@@ -120,11 +120,13 @@ def compile_model(model):
                 loss='mean_squared_error',
                 metrics=['binary_accuracy', 'binary_crossentropy'])
 
-def create_model():
+def create_model(opt):
   """Create neural network model, defining layer architecture."""
+  dim_y = int((opt['crop_max_y'] - opt['crop_min_y']) / opt['scale_factor'])
+  dim_x = int((opt['crop_max_x'] - opt['crop_min_x']) / opt['scale_factor'])
   model = Sequential()
   # Convolution2D(output_depth, convolution height, convolution_width, ...)
-  model.add(Conv2D(20, (5, 5), padding='same', dilation_rate=4, input_shape=(158,400,3))) # Need to calculate 600->158
+  model.add(Conv2D(20, (5, 5), padding='same', dilation_rate=4, input_shape=(dim_y,dim_x,3)))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
   model.add(Dropout(0.5))
@@ -150,6 +152,6 @@ def create_model():
   model.add(Dropout(0.5))
   model.add(Conv2D(1, (5, 5), padding='same', kernel_regularizer=l2(0.01)))
   model.add(Activation('sigmoid'))
-  model.add(Reshape((158,400)))
+  model.add(Reshape((dim_y,dim_x)))
   compile_model(model)
   return model

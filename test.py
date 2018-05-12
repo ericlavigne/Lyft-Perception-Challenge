@@ -2,11 +2,11 @@ import numpy as np
 import os
 import util
 
-examples = [75,270]
+examples = [75,251,270]
 
 os.makedirs("/tmp/output/infer_road", exist_ok=True)
 
-model = util.create_model()
+model = util.create_model(util.preprocess_opts)
 util.compile_model(model)
 model.load_weights("road.h5")
 
