@@ -43,8 +43,8 @@ def read_masks(example_number):
 
 preprocess_opts = {'original_max_x': 800, 'original_max_y': 600,
                    'crop_min_x': 0, 'crop_min_y': 210,
-                   'crop_max_x': 800, 'crop_max_y': 526,
-                   'scale_factor': 2}
+                   'crop_max_x': 800, 'crop_max_y': 525,
+                   'scale_factor': 5}
                    # can crop 75 off the bottom and 212 off the top
 
 def crop(img,opt):
