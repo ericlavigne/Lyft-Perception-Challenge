@@ -9,11 +9,11 @@ os.makedirs("/tmp/output/infer_car", exist_ok=True)
 os.makedirs("/tmp/output/infer_road", exist_ok=True)
 
 car_model = car.create_model(util.preprocess_opts)
-util.compile_model(car_model)
+car.compile_model(car_model)
 car_model.load_weights("car.h5")
 
 road_model = road.create_model(util.preprocess_opts)
-util.compile_model(road_model)
+road.compile_model(road_model)
 road_model.load_weights("road.h5")
 
 for ex in examples:

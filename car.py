@@ -55,3 +55,17 @@ def create_model(opt):
   model.add(Activation('sigmoid'))
   model.add(Reshape((dim_y,dim_x)))
   return model
+
+def weighted_binary_crossentropy(weight):
+  """Higher weights increase the importance of examples in which
+     the correct answer is 1. Higher values should be used when
+     1 is a rare answer. Lower values should be used when 0 is
+     a rare answer."""
+  return (lambda y_true, y_pred: tf.nn.weighted_cross_entropy_with_logits(y_true, y_pred, weight))
+
+def compile_model(model):
+  """Would be part of create_model, except that same settings
+     also need to be applied when loading model from file."""
+  model.compile(optimizer='adam',
+                loss=weighted_binary_crossentropy(20.),
+                metrics=['binary_accuracy', 'binary_crossentropy'])

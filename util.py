@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import car
 import road
+from keras import backend as K
 
 def read_image(path):
   """Ensure images read in RGB format (used by moviepy and skvideo).
@@ -96,10 +97,3 @@ def postprocess_output(img,opt):
   img = unscale(img,opt)
   img = uncrop_output(img,opt)
   return img
-
-def compile_model(model):
-  """Would be part of create_model, except that same settings
-     also need to be applied when loading model from file."""
-  model.compile(optimizer='adam',
-                loss='mean_squared_error',
-                metrics=['binary_accuracy', 'binary_crossentropy'])

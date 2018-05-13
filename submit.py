@@ -22,8 +22,8 @@ answer_key = {}
 
 car_model = car.create_model(util.preprocess_opts)
 road_model = road.create_model(util.preprocess_opts)
-util.compile_model(car_model)
-util.compile_model(road_model)
+car.compile_model(car_model)
+road.compile_model(road_model)
 car_model.load_weights("car.h5")
 road_model.load_weights("road.h5")
 

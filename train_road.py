@@ -27,11 +27,14 @@ class sample_generator(object):
     return (np.array(images), np.array(masks))
 
 model = road.create_model(util.preprocess_opts)
-util.compile_model(model)
+road.compile_model(model)
 if os.path.exists("road.h5"):
   print("Loading existing model from road.h5")
   model.load_weights("road.h5")
-model.fit_generator(sample_generator(batch_size=10),
-                    steps_per_epoch=20,
-                    epochs=50)
+
+batch_size = 10
+model.fit_generator(sample_generator(batch_size=batch_size),
+                    steps_per_epoch=1000/batch_size,
+                    epochs=10)
+
 model.save_weights("road.h5")
