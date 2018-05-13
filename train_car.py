@@ -45,6 +45,6 @@ if os.path.exists("car.h5"):
 batch_size = 10
 model.fit_generator(sample_generator(batch_size=batch_size),
                     steps_per_epoch=1000/batch_size,
-                    epochs=10)
+                    epochs=30)
 
 model.save_weights("car.h5")
