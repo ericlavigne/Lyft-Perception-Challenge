@@ -97,3 +97,6 @@ def postprocess_output(img,opt):
   img = unscale(img,opt)
   img = uncrop_output(img,opt)
   return img
+
+def mask_percentage(img):
+  return len(np.where(img == 1)[0]) * 100.0 / len(img.flatten())
