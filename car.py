@@ -66,9 +66,20 @@ def weighted_binary_crossentropy(weight):
      a rare answer."""
   return (lambda y_true, y_pred: tf.nn.weighted_cross_entropy_with_logits(y_true, y_pred, weight))
 
+def weighted_mean_squared_error(weight):
+  """Higher weights increase the importance of examples in which
+     the correct answer is 1. Higher values should be used when
+     1 is a rare answer. Lower values should be used when 0 is
+     a rare answer."""
+  def weighted_mse_aux(y_true, y_pred):
+    weights = weight * y_true + (1 - y_true)
+    return tf.losses.mean_squared_error(y_true, y_pred, weights)
+  return weighted_mse_aux
+
+
 def compile_model(model):
   """Would be part of create_model, except that same settings
      also need to be applied when loading model from file."""
   model.compile(optimizer='adam',
-                loss=weighted_binary_crossentropy(34.6),
+                loss=weighted_mean_squared_error(34.6),
                 metrics=['binary_accuracy', 'binary_crossentropy'])

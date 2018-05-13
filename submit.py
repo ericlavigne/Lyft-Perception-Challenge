@@ -57,8 +57,8 @@ for i, rgb_frame in enumerate(video, start=1):
     road_postprocess_time = time()
     prof['road_postprocess'] += (road_postprocess_time - road_predict_time)
 
-    binary_road_result = np.where(road_infer > 0.5,1,0).astype('uint8')
-    binary_car_result = np.where(car_infer > 0.5,1,0).astype('uint8')
+    binary_road_result = np.where((road_infer > 0.5) & (road_infer > car_infer),1,0).astype('uint8')
+    binary_car_result = np.where((car_infer > 0.5) & (car_infer > road_infer),1,0).astype('uint8')
     binary_road_result[binary_car_result == 1] = 0 # if uncertain, safer to assume car than road
     encode_array_time = time()
     prof['encode_array'] += (encode_array_time - road_postprocess_time)
