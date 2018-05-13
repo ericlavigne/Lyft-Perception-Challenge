@@ -3,12 +3,23 @@ import os.path
 import random
 import util
 import car
+from time import time
 
 class sample_generator(object):
 
   def __init__(self, batch_size=10):
     self.batch_size = batch_size
     self.all_examples = list(range(1000))
+    self.all_training_input = []
+    self.all_training_output = []
+    print("Reading car training data...")
+    start_time = time()
+    for i in range(1000):
+      self.all_training_input.append(util.preprocess_input_image(util.read_train_image(i),util.preprocess_opts))
+      road_mask, car_mask = util.read_masks(i)
+      self.all_training_output.append(util.preprocess_mask(car_mask,util.preprocess_opts))
+    elapsed = time() - start_time
+    print("    Spent %.0f seconds reading training data." % (elapsed))
 
   def __iter__(self):
     return self
@@ -21,9 +32,8 @@ class sample_generator(object):
     images = []
     masks = []
     for i in selected:
-      images.append(util.preprocess_input_image(util.read_train_image(i),util.preprocess_opts))
-      road_mask, car_mask = util.read_masks(i)
-      masks.append(util.preprocess_mask(car_mask,util.preprocess_opts))
+      images.append(self.all_training_input[i])
+      masks.append(self.all_training_output[i])
     return (np.array(images), np.array(masks))
 
 model = car.create_model(util.preprocess_opts)

@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from keras.layers.convolutional import Conv2D
 from keras.layers.core import Activation, Dropout, Reshape
 from keras.layers.normalization import BatchNormalization
