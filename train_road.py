@@ -4,6 +4,7 @@ import random
 import util
 import road
 from time import time
+import training
 
 class sample_generator(object):
 
@@ -12,11 +13,14 @@ class sample_generator(object):
     self.all_examples = list(range(1000))
     self.all_training_input = []
     self.all_training_output = []
+    augmentation = training.pick_range_of_augmentations(0, 2)
     print("Reading road training data...")
     start_time = time()
     for i in range(1000):
-      self.all_training_input.append(util.preprocess_input_image(util.read_train_image(i),util.preprocess_opts))
+      img = util.read_train_image(i)
       road_mask, car_mask = util.read_masks(i)
+      img, car_mask, road_mask = augmentation(img,car_mask,road_mask)
+      self.all_training_input.append(util.preprocess_input_image(img,util.preprocess_opts))
       self.all_training_output.append(util.preprocess_mask(road_mask,util.preprocess_opts))
     elapsed = time() - start_time
     print("    Spent %.0f seconds reading training data." % (elapsed))
