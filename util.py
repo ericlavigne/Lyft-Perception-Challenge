@@ -1,4 +1,5 @@
 import cv2
+from glob import glob
 import numpy as np
 import tensorflow as tf
 import car
@@ -31,13 +32,16 @@ def write_probability(path,probability):
   img[probability > 0.8] = [254,254,254] # white
   write_image(path,img)
 
-def read_train_image(example_number):
-  """Read image for training example."""
-  return read_image("/tmp/Train/CameraRGB/" + str(example_number) + ".png")
+def all_examples():
+  return [x.split('/')[-1].split('.')[0] for x in glob("/tmp/Train/CameraSeg/*.png")]
 
-def read_masks(example_number):
+def read_train_image(example):
+  """Read image for training example."""
+  return read_image("/tmp/Train/CameraRGB/" + str(example) + ".png")
+
+def read_masks(example):
   """Read road and car masks for training example."""
-  img = read_image("/tmp/Train/CameraSeg/" + str(example_number) + ".png")
+  img = read_image("/tmp/Train/CameraSeg/" + str(example) + ".png")
   road_mask = road.convert_image_to_mask(img)
   car_mask = car.convert_image_to_mask(img)
   return road_mask, car_mask

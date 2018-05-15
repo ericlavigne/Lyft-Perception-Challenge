@@ -1,3 +1,6 @@
 .DS_Store
 output
 *.pyc
+data
+env
+*.h5
