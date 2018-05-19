@@ -1,9 +1,10 @@
 import losses
 import numpy as np
+from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D, UpSampling2D
 from keras.layers.core import Activation, Dropout, Reshape
 from keras.layers.normalization import BatchNormalization
-from keras.models import Sequential
+from keras.models import Model
 from keras.regularizers import l2
 
 def convert_image_to_mask(img):
@@ -23,62 +24,51 @@ def convert_image_to_mask(img):
   car_mask[497:,108:691] = 0
   return car_mask
 
+def conv(previous_layer, depth, kernel):
+  layer1 = Conv2D(depth, kernel, padding='same')(previous_layer)
+  layer2 = BatchNormalization()(layer1)
+  layer3 = Activation('tanh')(layer2)
+  return layer3
+
 def create_model(opt):
   """Create neural network model, defining layer architecture."""
   dim_y = int((opt['crop_max_y'] - opt['crop_min_y']) / opt['scale_factor'])
   dim_x = int((opt['crop_max_x'] - opt['crop_min_x']) / opt['scale_factor'])
-  model = Sequential()
-  model.add(Conv2D(64, (3, 3), padding='same', input_shape=(dim_y,dim_x,3)))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(64, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
 
-  model.add(MaxPooling2D())
+  inputs = Input(shape=(dim_y,dim_x,3))
 
-  model.add(Conv2D(128, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(128, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
+  conv_1_1 = conv(inputs,64,3)
+  conv_1_2 = conv(conv_1_1,64,3)
 
-  model.add(MaxPooling2D())
+  pool_1 = MaxPooling2D()(conv_1_2)
 
-  model.add(Conv2D(256, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(256, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(256, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(256, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
+  conv_2_1 = conv(pool_1,128,3)
+  conv_2_2 = conv(conv_2_1,128,3)
 
-  model.add(UpSampling2D())
+  pool_2 = MaxPooling2D()(conv_2_2)
 
-  model.add(Conv2D(128, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(128, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
+  conv_3_1 = conv(pool_2,256,3)
+  conv_3_2 = conv(conv_3_1,256,3)
+  conv_3_3 = conv(conv_3_2,256,3)
+  conv_3_4 = conv(conv_3_3,256,3)
 
-  model.add(UpSampling2D())
+  unpool_2 = UpSampling2D()(conv_3_4)
 
-  model.add(Conv2D(64, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(64, (3, 3), padding='same'))
-  model.add(BatchNormalization())
-  model.add(Activation('tanh'))
-  model.add(Conv2D(1, (3, 3), padding='same', kernel_regularizer=l2(0.01)))
-  model.add(Activation('sigmoid'))
-  model.add(Reshape((dim_y,dim_x)))
+  conv_4_1 = conv(unpool_2,128,3)
+  conv_4_2 = conv(conv_4_1,128,3)
+
+  unpool_1 = UpSampling2D()(conv_4_2)
+
+
+  conv_5_1 = conv(unpool_1,64,3)
+  conv_5_2 = conv(conv_5_1,64,3)
+
+  conv_6 = Conv2D(1, (3, 3), padding='same', kernel_regularizer=l2(0.01))(conv_5_2)
+  conv_6 = Activation('sigmoid')(conv_6)
+  conv_6 = Reshape((dim_y,dim_x))(conv_6)
+
+  model = Model(inputs=inputs, outputs = conv_6, name="Car")
+
   return model
 
 def compile_model(model):
