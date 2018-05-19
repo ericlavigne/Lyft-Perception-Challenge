@@ -1,6 +1,6 @@
 import losses
 import numpy as np
-from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import Conv2D, MaxPooling2D, UpSampling2D
 from keras.layers.core import Activation, Dropout, Reshape
 from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential
@@ -28,34 +28,54 @@ def create_model(opt):
   dim_y = int((opt['crop_max_y'] - opt['crop_min_y']) / opt['scale_factor'])
   dim_x = int((opt['crop_max_x'] - opt['crop_min_x']) / opt['scale_factor'])
   model = Sequential()
-  model.add(Conv2D(20, (5, 5), padding='same', input_shape=(dim_y,dim_x,3)))
+  model.add(Conv2D(64, (3, 3), padding='same', input_shape=(dim_y,dim_x,3)))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(40, (5, 5), padding='same'))
+  model.add(Conv2D(64, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(50, (5, 5), padding='same'))
+
+  model.add(MaxPooling2D())
+
+  model.add(Conv2D(128, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(40, (5, 5), padding='same'))
+  model.add(Conv2D(128, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(30, (5, 5), padding='same'))
+
+  model.add(MaxPooling2D())
+
+  model.add(Conv2D(256, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(20, (5, 5), padding='same'))
+  model.add(Conv2D(256, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
-  model.add(Conv2D(10, (3, 3), padding='same'))
+  model.add(Conv2D(256, (3, 3), padding='same'))
   model.add(BatchNormalization())
   model.add(Activation('tanh'))
-  model.add(Dropout(0.5))
+  model.add(Conv2D(256, (3, 3), padding='same'))
+  model.add(BatchNormalization())
+  model.add(Activation('tanh'))
+
+  model.add(UpSampling2D())
+
+  model.add(Conv2D(128, (3, 3), padding='same'))
+  model.add(BatchNormalization())
+  model.add(Activation('tanh'))
+  model.add(Conv2D(128, (3, 3), padding='same'))
+  model.add(BatchNormalization())
+  model.add(Activation('tanh'))
+
+  model.add(UpSampling2D())
+
+  model.add(Conv2D(64, (3, 3), padding='same'))
+  model.add(BatchNormalization())
+  model.add(Activation('tanh'))
+  model.add(Conv2D(64, (3, 3), padding='same'))
+  model.add(BatchNormalization())
+  model.add(Activation('tanh'))
   model.add(Conv2D(1, (3, 3), padding='same', kernel_regularizer=l2(0.01)))
   model.add(Activation('sigmoid'))
   model.add(Reshape((dim_y,dim_x)))

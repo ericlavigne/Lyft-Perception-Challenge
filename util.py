@@ -48,9 +48,11 @@ def read_masks(example):
 
 preprocess_opts = {'original_max_x': 800, 'original_max_y': 600,
                    'crop_min_x': 0, 'crop_min_y': 210,
-                   'crop_max_x': 800, 'crop_max_y': 525,
+                   'crop_max_x': 800, 'crop_max_y': 530,
                    'scale_factor': 5}
                    # can crop 75 off the bottom and 212 off the top
+                   # Need cropped and scaled x/y dimensions to be
+                   # divisible by 16 to allow pooling/unpooling
 
 def crop(img,opt):
   return img[opt['crop_min_y']:opt['crop_max_y'], opt['crop_min_x']:opt['crop_max_x']]
