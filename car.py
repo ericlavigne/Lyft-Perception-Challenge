@@ -1,6 +1,6 @@
 import losses
 import numpy as np
-from keras.layers import Input
+from keras.layers import Input, Concatenate
 from keras.layers.convolutional import Conv2D, MaxPooling2D, UpSampling2D
 from keras.layers.core import Activation, Dropout, Reshape
 from keras.layers.normalization import BatchNormalization
@@ -53,11 +53,13 @@ def create_model(opt):
   conv_3_4 = conv(conv_3_3,256,3)
 
   unpool_2 = UpSampling2D()(conv_3_4)
+  unpool_2 = Concatenate()([unpool_2, conv_2_2]) # skip layer
 
   conv_4_1 = conv(unpool_2,128,3)
   conv_4_2 = conv(conv_4_1,128,3)
 
   unpool_1 = UpSampling2D()(conv_4_2)
+  unpool_1 = Concatenate()([unpool_1, conv_1_2]) # skip layer
 
 
   conv_5_1 = conv(unpool_1,64,3)
