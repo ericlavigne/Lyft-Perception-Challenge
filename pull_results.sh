@@ -6,3 +6,5 @@ scp eric@192.168.1.97:/tmp/output/augment/*.png output/augment/
 scp eric@192.168.1.97:/tmp/output/infer_car/*.png output/infer_car/
 scp eric@192.168.1.97:/tmp/output/infer_road/*.png output/infer_road/
 scp eric@192.168.1.97:/tmp/output/preprocessing/*.png output/preprocessing/
+scp eric@192.168.1.97:/home/eric/workspace/Lyft-Perception-Challenge/car.h5 car.h5
+scp eric@192.168.1.97:/home/eric/workspace/Lyft-Perception-Challenge/road.h5 road.h5
