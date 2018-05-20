@@ -78,4 +78,4 @@ def compile_model(model):
      also need to be applied when loading model from file."""
   model.compile(optimizer='adam',
                 loss=losses.balanced_binary_mean_squared_error,
-                metrics=['binary_accuracy', losses.weighted_mean_squared_error(34.6)])
+                metrics=['binary_accuracy'])
