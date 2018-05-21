@@ -33,3 +33,31 @@ def balanced_binary_mean_squared_error(y_true, y_pred):
   weight_ones = count_total * (1 + smooth) / (2 * count_ones + smooth * count_total)
   weight_zeros = count_total * (1 + smooth) / (2 * count_zeros + smooth * count_total)
   return K.sum((weight_ones * y_true + weight_zeros * (1 - y_true)) * K.square(y_true - y_pred)) / count_total
+
+def dice(y_true,y_pred):
+  """Dice is designed as a continuous and differentiable
+     version of the F-score."""
+  true_pos = K.sum(y_true * K.abs(y_pred))
+  true_neg = K.sum((1 - y_true) * K.abs(1 - y_pred))
+  falses = K.sum(K.abs(y_pred - y_true))
+  smooth = 10.0
+  return (true_pos * 2 + falses + smooth) / (true_pos * 2 + smooth) - 1
+
+def squared_union_over_intersection(y_true, y_pred):
+  """Combining ideas from dice loss and mean squared error.
+     Calculate union over intersection based on dice loss.
+     Perform same calculation for both positive and negative
+     classes and add the result so that the metric works for
+     both common and rare classes. Calculating inclusion in
+     a class based on squared distance rather than distance
+     encourages choosing 0.5 rather than guessing 0 or 1
+     when correct answer is uncertain. This penalty for
+     guessing is similar to the difference between mean
+     squared error and mean absolute error."""
+  true_pos = K.sum(y_true * K.square(y_pred))
+  true_neg = K.sum((1 - y_true) * K.square(1 - y_pred))
+  falses = K.sum(K.square(y_pred - y_true))
+  smooth = 10.0
+  pos_loss = (true_pos + falses + smooth) / (true_pos + smooth)
+  neg_loss = (true_neg + falses + smooth) / (true_neg + smooth)
+  return pos_loss + neg_loss - 2

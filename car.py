@@ -65,7 +65,7 @@ def create_model(opt):
   conv_5_1 = conv(unpool_1,64,3)
   conv_5_2 = conv(conv_5_1,64,3)
 
-  conv_6 = Conv2D(1, (3, 3), padding='same', kernel_regularizer=l2(0.01))(conv_5_2)
+  conv_6 = Conv2D(1, 3, padding='same', kernel_regularizer=l2(0.01))(conv_5_2)
   conv_6 = Activation('sigmoid')(conv_6)
   conv_6 = Reshape((dim_y,dim_x))(conv_6)
 
