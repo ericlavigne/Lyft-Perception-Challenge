@@ -58,7 +58,7 @@ train_generator = sample_generator(batch_size=batch_size,
 validation_generator = sample_generator(batch_size=batch_size,
                                         max_examples=100,
                                         augmentations_per_example=5)
-num_savepoints = 3
+num_savepoints = 6
 for i in range(num_savepoints):
   print("Training batch " + str(i+1) + " of " + str(num_savepoints))
   model.fit_generator(train_generator,
