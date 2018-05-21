@@ -52,7 +52,7 @@ if os.path.exists("car.h5"):
   print("Loading existing model from car.h5")
   model.load_weights("car.h5")
 
-batch_size = 10
+batch_size = 100
 train_generator = sample_generator(batch_size=batch_size,
                                    augmentations_per_example=5)
 validation_generator = sample_generator(batch_size=batch_size,
