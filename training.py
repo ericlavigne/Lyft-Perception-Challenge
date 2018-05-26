@@ -13,10 +13,10 @@ def flip(img,car_mask,road_mask,other_img=None,other_car_mask=None):
 def copy_vehicles(img,car_mask,road_mask,other_img,other_car_mask):
   if other_img is None:
     return (img,car_mask,road_mask)
-  # TODO: Add random scaling between 0.5 and 1.25
-  # TODO: Add random rotation between -15 and +15 degrees
-  roll0 = random.randint(0,img.shape[0])
-  roll1 = random.randint(0,img.shape[1])
+  # TODO: Add random scaling between 0.75 and 1.00
+  # TODO: Add random rotation between -10 and +10 degrees
+  roll0 = random.randint(int(-0.05 * img.shape[0]),int(0.05 * img.shape[0]))
+  roll1 = random.randint(int(-0.05 * img.shape[1]),int(0.05 * img.shape[1]))
   other_img = np.roll(other_img,(roll0,roll1),axis=(0,1))
   other_car_mask = np.roll(other_car_mask,(roll0,roll1),axis=(0,1))
   result_img = np.zeros_like(img)
