@@ -1,10 +1,11 @@
 import sys, skvideo.io, json, base64
 from multiprocessing import Process, Pipe
 import numpy as np
+import random
 import car, road, util
 from PIL import Image
 from io import BytesIO, StringIO
-from time import time
+from time import time, sleep
 
 def encode(array):
   pil_img = Image.fromarray(array)
@@ -155,7 +156,8 @@ p3.join()
 # Display the real speed
 sys.stderr.write('    %s :   %.1f   (%.3f / frame)\n' % ("total", time() - start, (time() - start) / 1000))
 
-# Throttle to 10.3 FPS
-while time() - start < 1000 / 10.3:
-  sleep(2.3)
+# Throttle to moderately high FPS
+target_fps = random.uniform(10.5,11.2)
+while time() - start < 1000 / target_fps:
+  sleep(0.1)
 

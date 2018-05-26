@@ -13,21 +13,28 @@ class sample_generator(object):
     self.all_aug_labels = []
     self.all_training_input = {}
     self.all_training_output = {}
-    augmentation = training.pick_range_of_augmentations(0, 2)
+    augmentation = training.pick_range_of_augmentations(0, 3)
     example_labels = util.all_examples()
     if max_examples is not None:
       example_labels = random.sample(example_labels, max_examples)
     print("Reading car training data...")
     start_time = time()
+    examples_for_augmentation = []
+    desired_examples_for_augmentation = augmentations_per_example * 10
     for i in example_labels:
       img = util.read_train_image(i)
       road_mask, car_mask = util.read_masks(i)
+      examples_for_augmentation.append((img,car_mask))
       for j in range(augmentations_per_example):
         aug_label = str(i) + " " + str(j)
-        aug_img, aug_car_mask, aug_road_mask = augmentation(img,car_mask,road_mask)
+        prev_ex = random.choice(examples_for_augmentation)
+        aug_img, aug_car_mask, aug_road_mask = augmentation(img,car_mask,road_mask,prev_ex[0],prev_ex[1])
+        examples_for_augmentation.append((aug_img,aug_car_mask))
         self.all_aug_labels.append(aug_label)
         self.all_training_input[aug_label] = util.preprocess_input_image(aug_img,util.preprocess_opts)
         self.all_training_output[aug_label] = util.preprocess_mask(aug_car_mask,util.preprocess_opts)
+      if len(examples_for_augmentation) > desired_examples_for_augmentation:
+        examples_for_augmentation = random.sample(examples_for_augmentation, desired_examples_for_augmentation)
     elapsed = time() - start_time
     print("    Spent %.0f seconds reading training data." % (elapsed))
 

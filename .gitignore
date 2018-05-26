@@ -4,3 +4,4 @@ output
 data
 env
 *.h5
+jwt

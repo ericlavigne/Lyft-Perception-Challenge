@@ -19,12 +19,14 @@ road_model = road.create_model(util.preprocess_opts)
 road.compile_model(road_model)
 road_model.load_weights("road.h5")
 
-def write_augmentation(example, img, car_mask, road_mask, augmentation_name, augmentation):
+def write_augmentation(example, img, car_mask, road_mask, prev_ex, augmentation_name, augmentation):
   base = "/tmp/output/augment/" + str(ex) + "_"
-  img, car_mask, road_mask = augmentation(img, car_mask, road_mask)
+  img, car_mask, road_mask = augmentation(img, car_mask, road_mask, prev_ex[0], prev_ex[1])
   util.write_image(base + augmentation_name + ".png", img)
   util.write_mask(base + augmentation_name + "_car.png", car_mask)
   util.write_mask(base + augmentation_name + "_road.png", road_mask)
+
+prev_ex = (None,None)
 
 for ex in examples:
   pre_out = "/tmp/output/preprocessing/" + str(ex)
@@ -51,6 +53,7 @@ for ex in examples:
   road_infer = util.postprocess_output(road_infer, util.preprocess_opts)
   util.write_probability(road_out + "_infer.png", road_infer)
   for aug_name in training.all_augmentations.keys():
-    write_augmentation(ex, img, car_mask, road_mask, aug_name, training.all_augmentations[aug_name])
+    write_augmentation(ex, img, car_mask, road_mask, prev_ex, aug_name, training.all_augmentations[aug_name])
   for i in range(1,3):
-    write_augmentation(ex, img, car_mask, road_mask, "pick" + str(i), training.pick_n_augmentations(i))
+    write_augmentation(ex, img, car_mask, road_mask, prev_ex, "pick" + str(i), training.pick_n_augmentations(i))
+  prev_ex = (img,car_mask)
