@@ -34,6 +34,47 @@ def balanced_binary_mean_squared_error(y_true, y_pred):
   weight_zeros = count_total * (1 + smooth) / (2 * count_zeros + smooth * count_total)
   return K.sum((weight_ones * y_true + weight_zeros * (1 - y_true)) * K.square(y_true - y_pred)) / count_total
 
+def precision(y_true,y_pred):
+  true_pos = K.sum(y_true * K.round(y_pred))
+  false_pos = K.sum((1 - y_true) * K.round(y_pred))
+  return (true_pos + 0.1) / (true_pos + false_pos + 0.1)
+
+def recall(y_true,y_pred):
+  true_pos = K.sum(y_true * K.round(y_pred))
+  false_neg = K.sum(y_true * K.round(1 - y_pred))
+  return (true_pos + 0.1) / (true_pos + false_neg + 0.1)
+
+# Beta is 2 for cars and .5 or road
+def f_score(beta):
+  def fscore(y_true,y_pred):
+    p = precision(y_true,y_pred)
+    r = recall(y_true,y_pred)
+    return (1.0 + beta*beta) * (p * r) / (beta*beta * p + r)
+  return fscore
+
+# Will round num to 0 or 1, but with a continuous and differentiable curve
+def round_cont(num):
+  return K.tanh(num * 4 - 2.0) * 0.5 + 0.5
+
+def precision_cont(y_true,y_pred):
+  true_pos = K.sum(y_true * round_cont(y_pred))
+  false_pos = K.sum((1 - y_true) * round_cont(y_pred))
+  return (true_pos + 0.1) / (true_pos + false_pos + 0.1)
+
+def recall_cont(y_true,y_pred):
+  true_pos = K.sum(y_true * K.round(y_pred))
+  false_neg = K.sum(y_true * K.round(1 - y_pred))
+  return (true_pos + 0.1) / (true_pos + false_neg + 0.1)
+
+# Returns approximately (1.0 - fscore) but using continuous/differentiable approximation
+def f_score_loss(beta):
+  def fscore_loss(y_true,y_pred):
+    p = precision_cont(y_true,y_pred)
+    r = recall_cont(y_true,y_pred)
+    return 1.0 - ((1.0 + beta*beta) * (p * r) / (beta*beta * p + r))
+  return fscore_loss
+
+
 def dice(y_true,y_pred):
   """Dice is designed as a continuous and differentiable
      version of the F-score."""

@@ -104,5 +104,5 @@ def compile_model(model):
   """Would be part of create_model, except that same settings
      also need to be applied when loading model from file."""
   model.compile(optimizer=Adam(amsgrad=True),
-                loss=losses.balanced_binary_mean_squared_error,
-                metrics=['binary_accuracy'])
+                loss=losses.balanced_binary_mean_squared_error, # losses.f_score_loss(2.0),
+                metrics=[losses.f_score(2.0), losses.precision, losses.recall])
