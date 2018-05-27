@@ -1,17 +1,15 @@
+import cv2
 import sys, skvideo.io, json, base64
 from multiprocessing import Process, Pipe
 import numpy as np
 import random
 import car, road, util
-from PIL import Image
 from io import BytesIO, StringIO
 from time import time, sleep
 
 def encode(array):
-  pil_img = Image.fromarray(array)
-  buff = BytesIO()
-  pil_img.save(buff, format="PNG")
-  return base64.b64encode(buff.getvalue()).decode("utf-8")
+  retval, buff = cv2.imencode('.png',array)
+  return base64.b64encode(buff).decode("utf-8")
 
 def preprocessor(filename,outpipe):
   try:
@@ -160,4 +158,3 @@ sys.stderr.write('    %s :   %.1f   (%.3f / frame)\n' % ("total", time() - start
 target_fps = random.uniform(10.5,11.2)
 while time() - start < 1000 / target_fps:
   sleep(0.1)
-
