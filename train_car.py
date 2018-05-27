@@ -5,24 +5,26 @@ import util
 import car
 from time import time
 import training
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 class sample_generator(object):
 
-  def __init__(self, batch_size=10, max_examples=None, augmentations_per_example=1):
+  def __init__(self, examples, batch_size=10, augmentations_per_example=0):
     self.batch_size = batch_size
     self.all_aug_labels = []
     self.all_training_input = {}
     self.all_training_output = {}
     augmentation = training.pick_range_of_augmentations(0, 3)
-    example_labels = util.all_examples()
-    if max_examples is not None:
-      example_labels = random.sample(example_labels, max_examples)
     print("Reading car training data...")
     start_time = time()
     examples_for_augmentation = []
-    for i in example_labels:
+    random.shuffle(examples)
+    for i in examples:
       img = util.read_train_image(i)
       road_mask, car_mask = util.read_masks(i)
+      self.all_aug_labels.append(i)
+      self.all_training_input[i] = util.preprocess_input_image(img,util.preprocess_opts)
+      self.all_training_output[i] = util.preprocess_mask(car_mask,util.preprocess_opts)
       examples_for_augmentation.append((img,car_mask))
       for j in range(augmentations_per_example):
         aug_label = str(i) + " " + str(j)
@@ -55,18 +57,23 @@ if os.path.exists("car.h5"):
   print("Loading existing model from car.h5")
   model.load_weights("car.h5")
 
+validation_size = 200
+(trn,val) = util.validation_split(util.all_examples(),validation_size)
+
 batch_size = 100
-train_generator = sample_generator(batch_size=batch_size,
+train_generator = sample_generator(examples=trn,
+                                   batch_size=batch_size,
                                    augmentations_per_example=5)
-validation_generator = sample_generator(batch_size=batch_size,
-                                        max_examples=100,
-                                        augmentations_per_example=5)
-num_savepoints = 6
-for i in range(num_savepoints):
-  print("Training batch " + str(i+1) + " of " + str(num_savepoints))
-  model.fit_generator(train_generator,
-                      validation_data=validation_generator,
-                      steps_per_epoch=1000/batch_size,
-                      validation_steps=300/batch_size,
-                      epochs=30)
-  model.save_weights("car.h5")
+validation_generator = sample_generator(examples=val,
+                                        batch_size=batch_size)
+
+stop_early = EarlyStopping(monitor='val_fscore', patience=20, mode='max', verbose=1)
+save_best = ModelCheckpoint(filepath='car.h5', monitor='val_fscore', mode='max',
+                            save_best_only=True, save_weights_only=True, verbose=1)
+
+model.fit_generator(train_generator,
+                    validation_data=validation_generator,
+                    steps_per_epoch=1000/batch_size,
+                    validation_steps=int(2*validation_size/batch_size),
+                    callbacks=[stop_early, save_best],
+                    epochs=200)

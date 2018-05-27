@@ -2,6 +2,8 @@ import cv2
 from glob import glob
 import numpy as np
 import tensorflow as tf
+import random
+import re
 import car
 import road
 from keras import backend as K
@@ -33,7 +35,32 @@ def write_probability(path,probability):
   write_image(path,img)
 
 def all_examples():
-  return [x.split('/')[-1].split('.')[0] for x in glob("/tmp/Train/CameraSeg/*.png")]
+  res = [x.split('/')[-1].split('.')[0] for x in glob("/tmp/Train/CameraSeg/*.png")]
+  def sort_order(x):
+    parts = re.sub(r'[A-Za-z]+','',x).split("-")
+    total = 0
+    weight = 1
+    parts.reverse()
+    for s in parts:
+      total += weight * int(s)
+      weight *= 1000
+    return total
+  res.sort(key=sort_order)
+  return res
+
+def validation_split(examples, val_count=100):
+  # select validation examples in chunks of 50 consecutive examples
+  # to minimize similarity between training and validation sets
+  validation_set = []
+  training_set = list(examples)
+  while len(validation_set) < val_count:
+    start_index = random.randrange(len(training_set))
+    taken = training_set[start_index:(start_index+min(50,val_count - len(validation_set)))]
+    validation_set = validation_set + taken
+    for x in taken:
+      training_set.remove(x)
+  return (training_set, validation_set)
+
 
 def read_train_image(example):
   """Read image for training example."""
