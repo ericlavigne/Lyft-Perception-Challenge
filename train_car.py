@@ -67,7 +67,7 @@ train_generator = sample_generator(examples=trn,
 validation_generator = sample_generator(examples=val,
                                         batch_size=batch_size)
 
-stop_early = EarlyStopping(monitor='val_fscore', patience=20, mode='max', verbose=1)
+stop_early = EarlyStopping(monitor='val_fscore', patience=50, mode='max', verbose=1)
 save_best = ModelCheckpoint(filepath='car.h5', monitor='val_fscore', mode='max',
                             save_best_only=True, save_weights_only=True, verbose=1)
 
