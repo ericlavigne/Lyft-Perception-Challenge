@@ -60,7 +60,7 @@ if os.path.exists("car.h5"):
 validation_size = 350
 (trn,val) = util.validation_split(util.all_examples(),validation_size)
 
-batch_size = 100
+batch_size = 20
 train_generator = sample_generator(examples=trn,
                                    batch_size=batch_size,
                                    augmentations_per_example=5)
