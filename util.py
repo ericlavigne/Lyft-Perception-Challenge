@@ -37,14 +37,15 @@ def write_probability(path,probability):
 def all_examples():
   res = [x.split('/')[-1].split('.')[0] for x in glob("/tmp/Train/CameraSeg/*.png")]
   def sort_order(x):
-    parts = re.sub(r'[A-Za-z]+','',x).split("-")
+    letters = re.sub(r'[^A-Za-z]+','',x)
+    num_parts = re.sub(r'[A-Za-z]+','',x).split("-")
     total = 0
     weight = 1
-    parts.reverse()
-    for s in parts:
-      total += weight * int(s)
+    num_parts.reverse()
+    for n in num_parts:
+      total += weight * int(n)
       weight *= 1000
-    return total
+    return [letters, total]
   res.sort(key=sort_order)
   return res
 

@@ -57,7 +57,7 @@ if os.path.exists("car.h5"):
   print("Loading existing model from car.h5")
   model.load_weights("car.h5")
 
-validation_size = 200
+validation_size = 350
 (trn,val) = util.validation_split(util.all_examples(),validation_size)
 
 batch_size = 100
