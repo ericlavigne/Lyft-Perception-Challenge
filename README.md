@@ -23,6 +23,7 @@ git clone https://github.com/ericlavigne/Lyft-Perception-Challenge
 cd Lyft-Perception-Challenge
 virtualenv -p python3 env
 source env/bin/activate
+./setup.sh
 pip install -r requirements.txt
 deactivate
 ```
@@ -30,10 +31,28 @@ deactivate
 Official submission process
 ---
 
+This project uses a client/server architecture for inference in order to avoid paying
+a startup cost (loading libraries and models) during a real-time process. The server
+and client should be started in separate consoles. The server should be allowed to
+complete the warmup process before running the client.
+
+1. Running the server
+
 ```sh
-./preinstall_script.sh
 cd Lyft-Perception-Challenge
-grader 'python submit.py'
+./setup.sh
+python submit_server.py
+submit
+```
+
+Wait for the warmup process to complete. The server will report that warmup has
+completed and show speed statistics for a small video on which it performs inference
+during the warmup process.
+
+2. Running the client
+
+```sh
+grader 'python submit_client.py'
 submit
 ```
 
@@ -41,10 +60,11 @@ Training
 ---
 
 The neural network training process assumes that training data can be found
-in /tmp/Train.
+in /tmp/Train as a result of running setup.sh during the installation process.
 
 ```sh
-python train.py
+python train_car.py
+python train_road.py
 ```
 
 Testing
@@ -52,7 +72,8 @@ Testing
 
 For manual unit testing, the test.py script creates visual examples of each step
 in the /tmp/output directory. The test.py script assumes that training data can
-be found in /tmp/Train.
+be found in /tmp/Train as a result of running setup.sh during the installation
+process.
 
 ```sh
 python test.py
