@@ -16,15 +16,27 @@ def preprocessor(inpipe,outpipe):
       filename = inpipe.recv()
       start_time = time()
       video = skvideo.io.vread(filename)
+      after_read_video = time()
+      read_video_time = after_read_video - start_time
       total_frames = 0
+      cropscale_time = 0.0
+      send_time = 0.0
       for i, rgb_frame in enumerate(video, start=1):
+        before_preprocess_image = time()
         preprocessed = util.preprocess_input_image(rgb_frame, util.preprocess_opts)
-        #sys.stderr.write("preproc sends " + str(i) + "\n")
+        after_preprocess_image = time()
         outpipe.send([i,preprocessed])
+        after_send = time()
+        cropscale_time += after_preprocess_image - before_preprocess_image
+        send_time += after_send - after_preprocess_image
         total_frames = total_frames + 1
-        #sys.stderr.write("preproc " + str(i) + "\n")
       preprocess_time = time() - start_time
+      extract_image_time = preprocess_time - read_video_time - cropscale_time - send_time
       sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("preprocessor", preprocess_time, preprocess_time / total_frames, total_frames))
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % (" pre:read", read_video_time, read_video_time / total_frames, total_frames))
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % (" pre:extract", extract_image_time, extract_image_time / total_frames, total_frames))
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % (" pre:cropscale", cropscale_time, cropscale_time / total_frames, total_frames))
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % (" pre:send", send_time, send_time / total_frames, total_frames))
       outpipe.send(["total_frames", total_frames])
 
     except Exception as inst:
