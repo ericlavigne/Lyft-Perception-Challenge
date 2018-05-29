@@ -1,12 +1,12 @@
 import losses
 import numpy as np
 from keras.layers import Input, Concatenate
-from keras.layers.convolutional import AveragePooling2D, Conv2D, MaxPooling2D, UpSampling2D
+from keras.layers.convolutional import Conv2D, MaxPooling2D, UpSampling2D
 from keras.layers.core import Activation, Dropout, Reshape
-from keras.layers.normalization import BatchNormalization
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.regularizers import l2
+from layers import conv, inception
 
 def convert_image_to_mask(img):
   """Convert image from Lyft's semantic segmentation format to car mask.
@@ -24,34 +24,6 @@ def convert_image_to_mask(img):
   # The center of the hood reaches y=497 between x values of 108 and 691
   car_mask[497:,108:691] = 0
   return car_mask
-
-def conv(previous_layer, depth, kernel):
-  layer1 = Conv2D(depth, kernel, padding='same')(previous_layer)
-  layer2 = BatchNormalization()(layer1)
-  layer3 = Activation('elu')(layer2)
-  return layer3
-
-def inception(prev, depth):
-  """Based on second InceptionV3 module whose output depth is 288.
-     Scale all component depths based on ratio between desired depth
-     and 288. Prevent any component depth from dropping below 16."""
-  scale48 = max(16, int(48 * depth / 288))
-  scale64 = max(16, int(64 * depth / 288))
-  scale96 = max(16, int(96 * depth / 288))
-
-  layer_1 = conv(prev, scale64, 1)
-
-  layer_2_1 = conv(prev, scale48, 1)
-  layer_2_2 = conv(layer_2_1, scale64, 5)
-
-  layer_3_1 = conv(prev, scale64, 1)
-  layer_3_2 = conv(layer_3_1, scale96, 3)
-  layer_3_3 = conv(layer_3_2, scale96, 3)
-
-  layer_4_1 = AveragePooling2D(pool_size=3, strides=1, padding='same')(prev)
-  layer_4_2 = conv(layer_4_1, scale64, 1)
-
-  return Concatenate()([layer_1, layer_2_2, layer_3_3, layer_4_2])
 
 def create_model(opt):
   """Create neural network model, defining layer architecture."""
@@ -104,7 +76,7 @@ def create_model(opt):
   decode_3_3 = inception(decode_3_2,128)
 
   unpool_2 = UpSampling2D()(decode_3_3)
-  unpool_2 = Concatenate()([unpool_2, conv_2_2]) # skip layer ######
+  unpool_2 = Concatenate()([unpool_2, conv_2_2]) # skip layer
 
   decode_2_1 = inception(unpool_2,128)
   decode_2_2 = inception(decode_2_1,64)
