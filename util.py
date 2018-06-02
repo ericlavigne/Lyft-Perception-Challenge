@@ -38,12 +38,13 @@ def all_examples():
   res = [x.split('/')[-1].split('.')[0] for x in glob("/tmp/Train/CameraSeg/*.png")]
   def sort_order(x):
     letters = re.sub(r'[^A-Za-z]+','',x)
-    num_parts = re.sub(r'[A-Za-z]+','',x).split("-")
+    num_parts = re.split("[^0-9]+0*",x)
     total = 0
     weight = 1
     num_parts.reverse()
     for n in num_parts:
-      total += weight * int(n)
+      if n != '':
+        total += weight * int(n)
       weight *= 1000
     return [letters, total]
   res.sort(key=sort_order)
@@ -61,7 +62,6 @@ def validation_split(examples, val_count=100):
     for x in taken:
       training_set.remove(x)
   return (training_set, validation_set)
-
 
 def read_train_image(example):
   """Read image for training example."""
