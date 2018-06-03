@@ -1,9 +1,10 @@
 from shutil import copyfile
 import sys
 import zmq
+import random
 
 file = sys.argv[-1]
-tempfile = "/tmp/" + file.split("/")[-1]
+tempfile = "/tmp/" + str(int(random.random() * 100000)) + "_" + file.split("/")[-1]
 copyfile(file, tempfile)
 
 context = zmq.Context()

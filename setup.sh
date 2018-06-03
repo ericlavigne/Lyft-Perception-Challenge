@@ -6,6 +6,7 @@ sudo apt-get install -y cuda-libraries-9-0
 pip install tensorflow-gpu==1.8
 pip install Keras==2.1.6
 pip install pyzmq
+pip install opencv-python
 
 cd /tmp
 
