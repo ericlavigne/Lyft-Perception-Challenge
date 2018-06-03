@@ -38,37 +38,37 @@ def create_model(opt):
 
   pool_2 = MaxPooling2D()(conv_2_2)
 
-  conv_3_1 = inception(pool_2,256)
-  conv_3_2 = inception(conv_3_1,256)
-  conv_3_3 = inception(conv_3_2,256)
+  conv_3_1 = inception(pool_2,128)
+  conv_3_2 = inception(conv_3_1,128)
+  conv_3_3 = inception(conv_3_2,128)
 
   pool_3 = MaxPooling2D()(conv_3_3)
 
-  conv_4_1 = inception(pool_3,512)
-  conv_4_2 = inception(conv_4_1,512)
-  conv_4_3 = inception(conv_4_2,512)
+  conv_4_1 = inception(pool_3,256)
+  conv_4_2 = inception(conv_4_1,256)
+  conv_4_3 = inception(conv_4_2,256)
 
   pool_4 = MaxPooling2D()(conv_4_3)
 
-  conv_5_1 = inception(pool_4,512)
-  conv_5_2 = inception(conv_5_1,512)
-  conv_5_3 = inception(conv_5_2,512)
-  conv_5_4 = inception(conv_5_3,512)
-  conv_5_5 = inception(conv_5_4,512)
-  conv_5_6 = inception(conv_5_5,512)
+  conv_5_1 = inception(pool_4,256)
+  conv_5_2 = inception(conv_5_1,256)
+  conv_5_3 = inception(conv_5_2,256)
+  conv_5_4 = inception(conv_5_3,256)
+  conv_5_5 = inception(conv_5_4,256)
+  conv_5_6 = inception(conv_5_5,256)
 
   unpool_4 = UpSampling2D()(conv_5_6)
   unpool_4 = Concatenate()([unpool_4, conv_4_3]) # skip layer
 
-  decode_4_1 = inception(unpool_4,512)
-  decode_4_2 = inception(decode_4_1,512)
-  decode_4_3 = inception(decode_4_2,256)
+  decode_4_1 = inception(unpool_4,256)
+  decode_4_2 = inception(decode_4_1,256)
+  decode_4_3 = inception(decode_4_2,128)
 
   unpool_3 = UpSampling2D()(decode_4_3)
   unpool_3 = Concatenate()([unpool_3, conv_3_3]) # skip layer
 
-  decode_3_1 = inception(unpool_3,256)
-  decode_3_2 = inception(decode_3_1,256)
+  decode_3_1 = inception(unpool_3,128)
+  decode_3_2 = inception(decode_3_1,128)
   decode_3_3 = inception(decode_3_2,128)
 
   unpool_2 = UpSampling2D()(decode_3_3)
@@ -86,7 +86,7 @@ def create_model(opt):
   final_layer = Activation('sigmoid')(final_layer)
   final_layer = Reshape((dim_y,dim_x))(final_layer)
 
-  model = Model(inputs=inputs, outputs = final_layer, name="Car")
+  model = Model(inputs=inputs, outputs = final_layer, name="Road")
 
   return model
 
