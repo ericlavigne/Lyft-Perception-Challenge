@@ -80,11 +80,9 @@ def predictor(inpipe,outpipe):
         msg = inpipe.recv()
         if msg[0] == "total_frames":
           total_frames = msg[1]
-          #sys.stderr.write("predict received total_frame message: " + str(total_frames) + "\n")
           continue
         frames_so_far += 1
         i,preprocessed = msg
-        #sys.stderr.write("predict receives " + str(i) + "\n")
         start_pred = time()
         car_infer = car_model.predict(np.array([preprocessed]), batch_size=1)[0]
         after_car = time()
@@ -93,8 +91,6 @@ def predictor(inpipe,outpipe):
         after_road = time()
         road_infer_time += (after_road - after_car)
         outpipe.send([i,car_infer,road_infer])
-      #sys.stderr.write("End of predict\n")
-      #sys.stderr.write("total_frames is " + str(total_frames) + "\n")
       sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("car infer", car_infer_time, car_infer_time / total_frames, total_frames))
       sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("road infer", road_infer_time, road_infer_time / total_frames, total_frames))
       outpipe.send(["total_frames",total_frames])
@@ -194,10 +190,5 @@ while True:
 
   # Display the real speed
   sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("total", time() - start, (time() - start) / frames, frames))
-
-  # Throttle to moderately high FPS
-  target_fps = random.uniform(10.5,11.2)
-  while time() - start < frames / target_fps:
-    sleep(0.1)
 
   socket.send_string(encoding)
