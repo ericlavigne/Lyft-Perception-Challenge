@@ -58,6 +58,7 @@ def preprocessor(inpipe,outpipe):
 def predictor(inpipe,outpipe):
   try:
     start_load = time()
+    batch_size = 7
     car_model = car.create_model(util.preprocess_opts)
     road_model = road.create_model(util.preprocess_opts)
     car.compile_model(car_model)
@@ -71,26 +72,41 @@ def predictor(inpipe,outpipe):
       frames_so_far = 0
       car_infer_time = 0.0
       road_infer_time = 0.0
+      receive_time = 0.0
+      send_time = 0.0
       while True:
         if total_frames is not None:
           if frames_so_far >= total_frames:
             break
           else:
             sys.stderr.write("predict missing frames: " + str(total_frames - frames_so_far) + "\n")
-        msg = inpipe.recv()
-        if msg[0] == "total_frames":
-          total_frames = msg[1]
-          continue
-        frames_so_far += 1
-        i,preprocessed = msg
+        images = []
+        indices = []
+        start_receive = time()
+        while len(images) < batch_size and (total_frames is None or frames_so_far < total_frames):
+          msg = inpipe.recv()
+          if msg[0] == "total_frames":
+            total_frames = msg[1]
+          else:
+            frames_so_far += 1
+            i,preprocessed = msg
+            images.append(preprocessed)
+            indices.append(i)
         start_pred = time()
-        car_infer = car_model.predict(np.array([preprocessed]), batch_size=1)[0]
-        after_car = time()
-        car_infer_time += (after_car - start_pred)
-        road_infer = road_model.predict(np.array([preprocessed]), batch_size=1)[0]
-        after_road = time()
-        road_infer_time += (after_road - after_car)
-        outpipe.send([i,car_infer,road_infer])
+        receive_time += (start_pred - start_receive)
+        if len(images) > 0:
+          car_inferences = car_model.predict(np.array(images), batch_size=len(images))
+          after_car = time()
+          car_infer_time += (after_car - start_pred)
+          road_inferences = road_model.predict(np.array(images), batch_size=len(images))
+          after_road = time()
+          road_infer_time += (after_road - after_car)
+          for i in range(len(images)):
+            outpipe.send([indices[i],car_inferences[i],road_inferences[i]])
+          after_send = time()
+          send_time += (after_send - after_road)
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("recv infer", receive_time, receive_time / total_frames, total_frames))
+      sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("send infer", send_time, send_time / total_frames, total_frames))
       sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("car infer", car_infer_time, car_infer_time / total_frames, total_frames))
       sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("road infer", road_infer_time, road_infer_time / total_frames, total_frames))
       outpipe.send(["total_frames",total_frames])
@@ -190,5 +206,10 @@ while True:
 
   # Display the real speed
   sys.stderr.write('    %s :   %.1f   (%.3f / frame) for %i frames\n' % ("total", time() - start, (time() - start) / frames, frames))
+
+  # Throttle to moderately high FPS
+  target_fps = random.uniform(10.5,11.2)
+  while time() - start < frames / target_fps:
+    sleep(0.1)
 
   socket.send_string(encoding)
