@@ -21,7 +21,7 @@ click==6.7
 cloudpickle==0.2.2
 colour==0.1.5
 conda==4.3.31
-cryptography==2.1.4
+cryptography==3.2
 cycler==0.10.0
 Cython==0.25.2
 dask==0.16.1
