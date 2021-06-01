@@ -160,7 +160,7 @@ traitlets==4.3.2
 tweepy==3.5.0
 twython==3.6.0
 udacity-pa==0.2.7
-urllib3==1.22
+urllib3==1.26.5
 utm==0.4.2
 uvloop==0.8.1
 vega==0.4.4
